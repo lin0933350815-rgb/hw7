@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>交通部觀光署組織架構互動式圖表</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      font-family: "Microsoft JhengHei", "PingFang TC", "Noto Sans TC", sans-serif;
+      background-color: #f8f9fa;
+    }
+
+    #chartdiv {
+      width: 100%;
+      height: 100vh;
+      font-size: 0.875rem;
+    }
+  </style>
+</head>
+
+<body>
+  <script src="https://cdn.amcharts.com/lib/5/index.js"></script>
+  <script src="https://cdn.amcharts.com/lib/5/hierarchy.js"></script>
+  <script src="https://cdn.amcharts.com/lib/5/themes/Animated.js"></script>
+  <script src="https://cdn.amcharts.com/lib/5/themes/ResponsiveMax.js"></script>
+  <script src="https://cdn.amcharts.com/lib/5/themes/Adaptive.js"></script>
+
+  <div id="chartdiv"></div>
+
+  <script>
+    // Create root element
+    var root = am5.Root.new("chartdiv");
+
+    // Set themes
+    root.setThemes([
+      am5themes_Animated.new(root),
+      am5themes_Adaptive.new(root, {
+        baseColor: 0x4150a0,
+        baseColor2: 0xf0825a,
+        count: 4,
+        mapShade: true,
+        keepContrast: true
+      }),
+      am5themes_ResponsiveMax.new(root)
+    ]);
+
+    var chart = root.container.children.push(
+      am5.SerialChartContainer.new(root, {
+        width: am5.p100,
+        height: am5.p100
+      })
+    );
+
+    // Zoom with the mouse wheel or a pinch, and drag to pan
+    chart.zoomableContainer.setAll({
+      wheelable: true,
+      pinchZoom: true
+    });
+
+    // Zoom in, zoom out and reset buttons
+    var zoomTools = chart.set("zoomTools", am5.ZoomTools.new(root, {}));
+
+    // Create series
+    var series = chart.series.push(am5hierarchy.Tree.new(root, {
+      singleBranchOnly: false,
+      downDepth: 1,
+      initialDepth: 10,
+      valueField: "value",
+      categoryField: "name",
+      childDataField: "children",
+      paddingRight: 60
+    }));
+
+    // Names shrink as far as needed to fit their circle instead of hiding
+    series.labels.template.set("minScale", 0);
+
+    // Configure tooltip to show node name and description
+    series.nodes.template.set("tooltipText", "[bold]{category}[/]\n{desc}");
+
+    // Set data: 交通部觀光署組織架構
+    series.data.setAll([{
+      name: "觀光署",
+      desc: "交通部觀光署（2023年9月由觀光局升格，設署長1人、副署長2人、主任秘書1人）",
+      children: [
+        {
+          name: "業務單位（6組）",
+          desc: "署本部核心業務規劃與執行單位",
+          children: [
+            { name: "企劃組", desc: "觀光政策與中長程計畫研擬、施政管考、觀光市場調查統計與研究" },
+            { name: "旅行業組", desc: "旅行業、導遊與領隊人員的管理、輔導、培訓及相關觀光團體督導" },
+            { name: "旅宿組", desc: "觀光旅館、一般旅館及民宿的登記管理、輔導、評鑑與品質提升" },
+            { name: "景區發展組", desc: "國家風景區與觀光遊憩區之規劃、建設工程、資源調查與環境維護" },
+            { name: "國際組", desc: "國際觀光市場開拓、海外宣傳推廣、國際組織參與及駐外辦事處督導" },
+            { name: "旅遊推廣組", desc: "國內旅遊推廣、主題旅遊與大型節慶活動（如台灣燈會）策劃、觀光遊樂業管理" }
+          ]
+        },
+        {
+          name: "幕僚單位（5室）",
+          desc: "署本部行政支援與內部管理單位",
+          children: [
+            { name: "秘書室", desc: "文書、檔案、印信、出納、採購、事務管理及公共關係" },
+            { name: "人事室", desc: "組織編制、任免遷調、考績獎懲、訓練進修等人事業務" },
+            { name: "政風室", desc: "廉政宣導、貪瀆預防、公務機密維護與安全防護" },
+            { name: "主計室", desc: "歲計、會計與統計業務之編製與審核" },
+            { name: "資訊室", desc: "觀光資訊系統規劃、數位轉型、資通安全維護及網站管理" }
+          ]
+        },
+        {
+          name: "任務編組與派出單位",
+          desc: "第一線旅客服務、媒體聯絡與海外推廣據點",
+          children: [
+            { name: "公關室", desc: "專責媒體聯絡與新聞發布（任務編組）" },
+            {
+              name: "旅客服務中心（3處）",
+              desc: "提供國內外旅客第一線諮詢與旅遊資訊服務",
+              children: [
+                { name: "觀光署旅遊服務中心", desc: "台北（含台中服務處等）" },
+                { name: "桃園國際機場旅服中心", desc: "臺灣桃園國際機場第一線旅客服務" },
+                { name: "高雄國際機場旅服中心", desc: "高雄國際機場第一線旅客服務" }
+              ]
+            },
+            {
+              name: "駐外辦事處（16處）",
+              desc: "派駐全球主要客源市場，負責當地觀光推廣",
+              children: [
+                { name: "東北亞地區", desc: "東京、大阪、首爾" },
+                { name: "港澳與東南亞", desc: "香港、曼谷、新加坡等" },
+                { name: "歐美地區", desc: "紐約、舊金山、洛杉磯、法蘭克福、倫敦等" }
+              ]
+            }
+          ]
+        },
+        {
+          name: "附屬機關（13個風管處）",
+          desc: "負責第一線國家風景區經營、管理與建設",
+          children: [
+            { name: "東北角及宜蘭海岸", desc: "東北角及宜蘭海岸國家風景區管理處" },
+            { name: "北海岸及觀音山", desc: "北海岸及觀音山國家風景區管理處" },
+            { name: "參山", desc: "參山國家風景區管理處" },
+            { name: "日月潭", desc: "日月潭國家風景區管理處" },
+            { name: "阿里山", desc: "阿里山國家風景區管理處" },
+            { name: "雲嘉南濱海", desc: "雲嘉南濱海國家風景區管理處" },
+            { name: "西拉雅", desc: "西拉雅國家風景區管理處" },
+            { name: "茂林", desc: "茂林國家風景區管理處" },
+            { name: "大鵬灣", desc: "大鵬灣國家風景區管理處" },
+            { name: "花東縱谷", desc: "花東縱谷國家風景區管理處" },
+            { name: "東部海岸", desc: "東部海岸國家風景區管理處" },
+            { name: "澎湖", desc: "澎湖國家風景區管理處" },
+            { name: "馬祖", desc: "馬祖國家風景區管理處" }
+          ]
+        }
+      ]
+    }]);
+
+    // Start at the top node
+    series.set("selectedDataItem", series.dataItems[0]);
+
+    // Make stuff animate on load
+    series.appear(1000, 100);
+  </script>
+</body>
+
+</html>

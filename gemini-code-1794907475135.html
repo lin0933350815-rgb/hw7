@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>交通部觀光署組織架構與觀光行政體系整合視覺化</title>
+  
+  <!-- amCharts 5 Libraries -->
+  <script src="https://cdn.amcharts.com/lib/5/index.js"></script>
+  <script src="https://cdn.amcharts.com/lib/5/hierarchy.js"></script>
+  <script src="https://cdn.amcharts.com/lib/5/themes/Animated.js"></script>
+  <script src="https://cdn.amcharts.com/lib/5/themes/ResponsiveMax.js"></script>
+  <script src="https://cdn.amcharts.com/lib/5/themes/Adaptive.js"></script>
+
+  <style>
+    :root {
+      --primary: #2b4c7e;
+      --primary-light: #eef3f9;
+      --accent: #e06d53;
+      --bg-body: #f4f6f9;
+      --bg-card: #ffffff;
+      --text-main: #1e293b;
+      --text-muted: #64748b;
+      --border-color: #e2e8f0;
+      --shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: "Microsoft JhengHei", "PingFang TC", "Noto Sans TC", sans-serif;
+      background-color: var(--bg-body);
+      color: var(--text-main);
+      line-height: 1.6;
+    }
+
+    /* Header */
+    header {
+      background: linear-gradient(135deg, #1e3a5f 0%, #3a6098 100%);
+      color: #ffffff;
+      padding: 1.75rem 2rem;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
+    }
+
+    .header-inner {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    header h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    header p {
+      font-size: 0.9rem;
+      color: #dbeafe;
+      margin-top: 0.25rem;
+    }
+
+    /* Navigation Tabs */
+    .nav-tabs {
+      display: flex;
+      gap: 0.5rem;
+      background: rgba(255, 255, 255, 0.14);
+      padding: 0.35rem;
+      border-radius: 10px;
+    }
+
+    .tab-btn {
+      border: none;
+      background: transparent;
+      color: #ffffff;
+      padding: 0.55rem 1.1rem;
+      border-radius: 7px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .tab-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .tab-btn.active {
+      background: #ffffff;
+      color: var(--primary);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Main Container */
+    main {
+      max-width: 1400px;
+      margin: 1.5rem auto;
+      padding: 0 1.5rem 2.5rem;
+    }
+
+    /* Info Banner */
+    .info-bar {
+      background-color: var(--bg-card);
+      border-left: 4px solid var(--accent);
+      border-radius: 8px;
+      padding: 0.9rem 1.25rem;
+      margin-bottom: 1.5rem;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 0.9rem;
+    }
+
+    .info-bar span {
+      color: var(--text-muted);
+    }
+
+    .info-bar strong {
+      color: var(--text-main);
+    }
+
+    /* View Layouts */
+    .charts-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .charts-grid.single-view {
+      grid-template-columns: 1fr;
+    }
+
+    .chart-card {
+      background: var(--bg-card);
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border-color);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .chart-card.hidden {
+      display: none;
+    }
+
+    .card-header {
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid var(--border-color);
+      background-color: #fafbfc;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .card-header h2 {
+      font-size: 1.05rem;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .badge {
+      font-size: 0.75rem;
+      background: var(--primary-light);
+      color: var(--primary);
+      padding: 0.2rem 0.6rem;
+      border-radius: 999px;
+      font-weight: 600;
+    }
+
+    .chart-box {
+      width: 100%;
+      height: 580px;
+      position: relative;
+    }
+
+    .single-view .chart-box {
+      height: 680px;
+    }
+
+    /* Administrative System Reference Section (from taiwan.net.tw?a=171) */
+    .system-section {
+      background: var(--bg-card);
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border-color);
+      padding: 1.5rem 1.75rem;
+    }
+
+    .system-section-header {
+      border-bottom: 2px solid var(--primary-light);
+      padding-bottom: 0.75rem;
+      margin-bottom: 1.25rem;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 0.5rem;
+    }
+
+    .system-section-header h2 {
+      font-size: 1.2rem;
+      color: var(--primary);
+    }
+
+    .system-section-header a {
+      font-size: 0.85rem;
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .system-section-header a:hover {
+      text-decoration: underline;
+    }
+
+    .system-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.25rem;
+    }
+
+    .system-card {
+      background: #f8fafc;
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 1.15rem 1.25rem;
+    }
+
+    .system-card h3 {
+      font-size: 1rem;
+      color: var(--primary);
+      margin-bottom: 0.6rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .system-card ul {
+      padding-left: 1.2rem;
+      font-size: 0.9rem;
+      color: #334155;
+    }
+
+    .system-card li {
+      margin-bottom: 0.4rem;
+    }
+
+    @media (max-width: 992px) {
+      .charts-grid {
+        grid-template-columns: 1fr;
+      }
+      .chart-box {
+        height: 500px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <div class="header-inner">
+      <div>
+        <h1>交通部觀光署組織架構與觀光行政體系</h1>
+        <p>整合樹狀組織圖（Tree）、旭日比例圖（Sunburst）與我國觀光行政體系說明</p>
+      </div>
+      <div class="nav-tabs" role="tablist">
+        <button class="tab-btn active" onclick="switchView('both', this)">雙圖並排總覽</button>
+        <button class="tab-btn" onclick="switchView('tree', this)">僅看樹狀架構圖</button>
+        <button class="tab-btn" onclick="switchView('sunburst', this)">僅看旭日階層圖</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="info-bar">
+      <div>
+        <strong>操作提示：</strong>
+        <span>滑鼠移至節點可檢視單位職掌；<strong>樹狀圖</strong>支援滾輪縮放與拖曳平移；<strong>旭日圖</strong>點擊扇區可下鑽放大檢視，點擊中心圓心返回上層。</span>
+      </div>
+      <div>
+        <span class="badge">根節點：觀光署（2023年9月升格）</span>
+      </div>
+    </div>
+
+    <!-- Interactive Charts Grid -->
+    <section id="chartsGrid" class="charts-grid">
+      <!-- Tree Chart Card -->
+      <div id="treeCard" class="chart-card">
+        <div class="card-header">
+          <h2>組織階層樹狀圖 (Tree Chart)</h2>
+          <span class="badge">點擊節點可展開 / 收合分支</span>
+        </div>
+        <div id="treeChartDiv" class="chart-box"></div>
+      </div>
+
+      <!-- Sunburst Chart Card -->
+      <div id="sunburstCard" class="chart-card">
+        <div class="card-header">
+          <h2>組織比例旭日圖 (Sunburst Chart)</h2>
+          <span class="badge">點擊扇區可聚焦下鑽</span>
+        </div>
+        <div id="sunburstChartDiv" class="chart-box"></div>
+      </div>
+    </section>
+
+    <!-- Administrative System Reference (taiwan.net.tw/Service/Articles?a=171) -->
+    <section class="system-section">
+      <div class="system-section-header">
+        <h2>我國觀光行政體系與遊憩區管理體系概覽</h2>
+        <a href="https://admin.taiwan.net.tw/Service/Articles?a=171" target="_blank" rel="noopener noreferrer">資料來源：交通部觀光署行政資訊網（觀光行政體系）↗</a>
+      </div>
+      <div class="system-grid">
+        <div class="system-card">
+          <h3>一、中央與地方觀光行政體系</h3>
+          <ul>
+            <li><strong>中央主管機關：</strong>交通部下設<strong>觀光署</strong>（署本部設6組5室，並轄管13個國家風景區管理處及16個駐外辦事處），統籌全國觀光政策、法規、產業輔導與國際行銷。</li>
+            <li><strong>地方主管機關：</strong>全國 <strong>6 直轄市及各縣（市）政府</strong>均設有觀光局（處）等專責單位，負責地方觀光建設、旅宿管理與行銷推廣。</li>
+          </ul>
+        </div>
+        <div class="system-card">
+          <h3>二、觀光遊憩區管理體系</h3>
+          <ul>
+            <li><strong>觀光行政體系轄管：</strong>國家級與地方級<strong>風景特定區</strong>（由觀光署各風管處或地方政府管理）及<strong>民營觀光遊樂區</strong>。</li>
+            <li><strong>跨部會協力轄管資源：</strong>
+              內政部<strong>國家公園署</strong>（國家公園）、農業部<strong>林業及自然保育署</strong>（森林遊樂區）及農業部農村發展及水土保持署（休閒農業區）等。
+            </li>
+          </ul>
+        </div>
+        <div class="system-card">
+          <h3>三、觀光署組織編制摘要</h3>
+          <ul>
+            <li><strong>業務單位（6組）：</strong>企劃組、旅行業組、旅宿組、景區發展組、國際組、旅遊推廣組。</li>
+            <li><strong>幕僚單位（5室）：</strong>秘書室、人事室、政風室、主計室、資訊室。</li>
+            <li><strong>任務編組與附屬機關：</strong>公關室、3處旅客服務中心、16處駐外辦事處，以及<strong>13個國家風景區管理處</strong>。</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    // 共用資料結構：交通部觀光署組織架構
+    const tourismOrgData = [{
+      name: "觀光署",
+      desc: "交通部觀光署（2023年9月由觀光局升格，設署長1人、副署長2人、主任秘書1人）",
+      children: [
+        {
+          name: "業務單位（6組）",
+          desc: "署本部核心業務規劃與執行單位",
+          children: [
+            { name: "企劃組", value: 1, desc: "觀光政策與中長程計畫研擬、施政管考、觀光市場調查統計與研究" },
+            { name: "旅行業組", value: 1, desc: "旅行業、導遊與領隊人員的管理、輔導、培訓及相關觀光團體督導" },
+            { name: "旅宿組", value: 1, desc: "觀光旅館、一般旅館及民宿的登記管理、輔導、評鑑與品質提升" },
+            { name: "景區發展組", value: 1, desc: "國家風景區與觀光遊憩區之規劃、建設工程、資源調查與環境維護" },
+            { name: "國際組", value: 1, desc: "國際觀光市場開拓、海外宣傳推廣、國際組織參與及駐外辦事處督導" },
+            { name: "旅遊推廣組", value: 1, desc: "國內旅遊推廣、主題旅遊與大型節慶活動（如台灣燈會）策劃、觀光遊樂業管理" }
+          ]
+        },
+        {
+          name: "幕僚單位（5室）",
+          desc: "署本部行政支援與內部管理單位",
+          children: [
+            { name: "秘書室", value: 1, desc: "文書、檔案、印信、出納、採購、事務管理及公共關係" },
+            { name: "人事室", value: 1, desc: "組織編制、任免遷調、考績獎懲、訓練進修等人事業務" },
+            { name: "政風室", value: 1, desc: "廉政宣導、貪瀆預防、公務機密維護與安全防護" },
+            { name: "主計室", value: 1, desc: "歲計、會計與統計業務之編製與審核" },
+            { name: "資訊室", value: 1, desc: "觀光資訊系統規劃、數位轉型、資通安全維護及網站管理" }
+          ]
+        },
+        {
+          name: "任務編組與派出單位",
+          desc: "第一線旅客服務、媒體聯絡與海外推廣據點",
+          children: [
+            { name: "公關室", value: 1, desc: "專責媒體聯絡與新聞發布（任務編組）" },
+            {
+              name: "旅客服務中心（3處）",
+              desc: "提供國內外旅客第一線諮詢與旅遊資訊服務",
+              children: [
+                { name: "觀光署旅遊服務中心", value: 1, desc: "台北（含台中服務處等）" },
+                { name: "桃園國際機場旅服中心", value: 1, desc: "臺灣桃園國際機場第一線旅客服務" },
+                { name: "高雄國際機場旅服中心", value: 1, desc: "高雄國際機場第一線旅客服務" }
+              ]
+            },
+            {
+              name: "駐外辦事處（16處）",
+              desc: "派駐全球主要客源市場，負責當地觀光推廣",
+              children: [
+                { name: "東北亞地區", value: 3, desc: "東京、大阪、首爾（共3處）" },
+                { name: "港澳與東南亞", value: 6, desc: "香港、曼谷、新加坡等（共6處）" },
+                { name: "歐美地區", value: 7, desc: "紐約、舊金山、洛杉磯、法蘭克福、倫敦等（共7處）" }
+              ]
+            }
+          ]
+        },
+        {
+          name: "附屬機關（13個風管處）",
+          desc: "負責第一線國家風景區經營、管理與建設",
+          children: [
+            { name: "東北角及宜蘭海岸", value: 1, desc: "東北角及宜蘭海岸國家風景區管理處" },
+            { name: "北海岸及觀音山", value: 1, desc: "北海岸及觀音山國家風景區管理處" },
+            { name: "參山", value: 1, desc: "參山國家風景區管理處" },
+            { name: "日月潭", value: 1, desc: "日月潭國家風景區管理處" },
+            { name: "阿里山", value: 1, desc: "阿里山國家風景區管理處" },
+            { name: "雲嘉南濱海", value: 1, desc: "雲嘉南濱海國家風景區管理處" },
+            { name: "西拉雅", value: 1, desc: "西拉雅國家風景區管理處" },
+            { name: "茂林", value: 1, desc: "茂林國家風景區管理處" },
+            { name: "大鵬灣", value: 1, desc: "大鵬灣國家風景區管理處" },
+            { name: "花東縱谷", value: 1, desc: "花東縱谷國家風景區管理處" },
+            { name: "東部海岸", value: 1, desc: "東部海岸國家風景區管理處" },
+            { name: "澎湖", value: 1, desc: "澎湖國家風景區管理處" },
+            { name: "馬祖", value: 1, desc: "馬祖國家風景區管理處" }
+          ]
+        }
+      ]
+    }];
+
+    // 1. 初始化樹狀圖 (Tree Chart)
+    function initTreeChart() {
+      var root = am5.Root.new("treeChartDiv");
+      root.setThemes([
+        am5themes_Animated.new(root),
+        am5themes_Adaptive.new(root, {
+          baseColor: 0x2b4c7e,
+          baseColor2: 0xe06d53,
+          count: 4,
+          mapShade: true,
+          keepContrast: true
+        }),
+        am5themes_ResponsiveMax.new(root)
+      ]);
+
+      var chart = root.container.children.push(
+        am5.SerialChartContainer.new(root, {
+          width: am5.p100,
+          height: am5.p100
+        })
+      );
+
+      chart.zoomableContainer.setAll({
+        wheelable: true,
+        pinchZoom: true
+      });
+
+      chart.set("zoomTools", am5.ZoomTools.new(root, {}));
+
+      var series = chart.series.push(am5hierarchy.Tree.new(root, {
+        singleBranchOnly: false,
+        downDepth: 1,
+        initialDepth: 2, // 預設展開至組織類別與第一層單位，避免畫面過於擁擠，點擊可繼續展開
+        valueField: "value",
+        categoryField: "name",
+        childDataField: "children",
+        paddingRight: 60
+      }));
+
+      series.labels.template.setAll({
+        minScale: 0,
+        fontSize: 12
+      });
+
+      series.nodes.template.set("tooltipText", "[bold]{category}[/]\n{desc}");
+
+      series.data.setAll(JSON.parse(JSON.stringify(tourismOrgData)));
+      series.set("selectedDataItem", series.dataItems[0]);
+      series.appear(1000, 100);
+    }
+
+    // 2. 初始化旭日圖 (Sunburst Chart)
+    function initSunburstChart() {
+      var root = am5.Root.new("sunburstChartDiv");
+      root.setThemes([
+        am5themes_Animated.new(root),
+        am5themes_Adaptive.new(root, {
+          baseColor: 0x2b4c7e,
+          baseColor2: 0xe06d53,
+          count: 7,
+          mapShade: true,
+          keepContrast: true
+        }),
+        am5themes_ResponsiveMax.new(root)
+      ]);
+
+      var chart = root.container.children.push(am5.SerialChartContainer.new(root, {
+        width: am5.percent(100),
+        height: am5.percent(100),
+        layout: root.verticalLayout
+      }));
+
+      var series = chart.series.push(am5hierarchy.Sunburst.new(root, {
+        singleBranchOnly: true,
+        downDepth: 10,
+        initialDepth: 10,
+        valueField: "value",
+        categoryField: "name",
+        childDataField: "children"
+      }));
+
+      series.nodes.template.set("tooltipText", "[bold]{category}[/]\n{desc}\n（涵蓋單位數：{sum}）");
+
+      series.labels.template.setAll({
+        fontSize: 11,
+        minScale: 0.45
+      });
+
+      series.data.setAll(JSON.parse(JSON.stringify(tourismOrgData)));
+      series.set("selectedDataItem", series.dataItems[0]);
+      series.appear(1000, 100);
+    }
+
+    // 視圖切換控制
+    function switchView(mode, btn) {
+      document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+
+      const grid = document.getElementById("chartsGrid");
+      const treeCard = document.getElementById("treeCard");
+      const sunburstCard = document.getElementById("sunburstCard");
+
+      if (mode === "both") {
+        grid.classList.remove("single-view");
+        treeCard.classList.remove("hidden");
+        sunburstCard.classList.remove("hidden");
+      } else if (mode === "tree") {
+        grid.classList.add("single-view");
+        treeCard.classList.remove("hidden");
+        sunburstCard.classList.add("hidden");
+      } else if (mode === "sunburst") {
+        grid.classList.add("single-view");
+        treeCard.classList.add("hidden");
+        sunburstCard.classList.remove("hidden");
+      }
+
+      // 觸發視窗 resize 事件讓 amCharts 自動調整畫布尺寸
+      window.dispatchEvent(new Event("resize"));
+    }
+
+    // 啟動圖表
+    initTreeChart();
+    initSunburstChart();
+  </script>
+</body>
+
+</html>
